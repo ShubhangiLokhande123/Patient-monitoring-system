@@ -37,7 +37,7 @@ AI-powered post-discharge patient monitoring system that conducts daily check-in
 - 🌐 **Web Application**: Full dashboard with chat interface
 - 🤖 **MCP Server**: AI assistant tool integration
 
-![Dashboard Screenshot](https://i.imgur.com/placeholder.png)
+![Dashboard Screenshot](https://github.com/ShubhangiLokhande123/Patient-monitoring-system/blob/main/backend/data/triage.png)
 *Dashboard showing 8 active patients, 2 high-risk cases, real-time risk scoring, and interactive chat interface*
 
 ---
