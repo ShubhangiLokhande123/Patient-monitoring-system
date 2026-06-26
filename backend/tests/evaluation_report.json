@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-06-25T17:07:31.969141",
+  "summary": {
+    "total_modules": 6,
+    "passed": 0,
+    "failed": 6,
+    "skipped": 0
+  },
+  "results": {
+    "test_phi_deidentifier.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    },
+    "test_vitals_intake.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    },
+    "test_clinical_triage.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    },
+    "test_supervisor.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    },
+    "test_rag_service.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    },
+    "test_integration.py": {
+      "status": "FAILED",
+      "exit_code": 1
+    }
+  }
+}

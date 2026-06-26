@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="7" failures="9" skipped="1" tests="22" time="1.461" timestamp="2026-06-25T17:07:30.115098+05:30" hostname="DESKTOP-OD6ROMA"><testcase classname="tests.test_integration.TestPatientEndpoints" name="test_list_patients" time="0.069"><failure message="assert 404 == 200&#10; +  where 404 = &lt;Response [404 Not Found]&gt;.status_code">test_integration.py:31: in test_list_patients
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404 Not Found]&gt;.status_code</failure></testcase><testcase classname="tests.test_integration.TestPatientEndpoints" name="test_get_patient_by_id" time="0.007"><failure message="KeyError: 0">test_integration.py:41: in test_get_patient_by_id
+    patient_id = patients[0]["id"]
+                 ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestPatientEndpoints" name="test_get_nonexistent_patient" time="0.011" /><testcase classname="tests.test_integration.TestPatientEndpoints" name="test_get_patient_vitals_history" time="0.016"><failure message="KeyError: 0">test_integration.py:56: in test_get_patient_vitals_history
+    patient_id = patients[0]["id"]
+                 ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestChatEndpoints" name="test_start_conversation" time="0.011"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:70: in test_patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestChatEndpoints" name="test_send_message" time="0.011"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:70: in test_patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestChatEndpoints" name="test_get_conversation_messages" time="0.012"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:70: in test_patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestChatEndpoints" name="test_end_conversation" time="0.009"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:70: in test_patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestAlertEndpoints" name="test_list_active_alerts" time="0.013"><failure message="assert 404 == 200&#10; +  where 404 = &lt;Response [404 Not Found]&gt;.status_code">test_integration.py:158: in test_list_active_alerts
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404 Not Found]&gt;.status_code</failure></testcase><testcase classname="tests.test_integration.TestAlertEndpoints" name="test_get_patient_alerts" time="0.015"><failure message="KeyError: 0">test_integration.py:166: in test_get_patient_alerts
+    patient_id = patients[0]["id"]
+                 ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestMultiTurnConversation" name="test_complete_vitals_collection" time="0.007"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:179: in patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestMultiTurnConversation" name="test_emergency_escalation_flow" time="0.015"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:179: in patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestMultiTurnConversation" name="test_question_answering_flow" time="0.018"><error message="failed on setup with &quot;KeyError: 0&quot;">test_integration.py:179: in patient_id
+    return patients[0]["id"] if patients else None
+           ^^^^^^^^^^^
+E   KeyError: 0</error></testcase><testcase classname="tests.test_integration.TestDatabaseOperations" name="test_patient_creation_and_retrieval" time="0.001"><failure message="AttributeError: 'PatientService' object has no attribute 'list_patients'">test_integration.py:295: in test_patient_creation_and_retrieval
+    patients = patient_service.list_patients()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PatientService' object has no attribute 'list_patients'</failure></testcase><testcase classname="tests.test_integration.TestDatabaseOperations" name="test_conversation_persistence" time="0.018"><failure message="KeyError: 0">test_integration.py:310: in test_conversation_persistence
+    patient_id = patients[0]["id"]
+                 ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestDatabaseOperations" name="test_vitals_recording" time="0.015"><failure message="KeyError: 0">test_integration.py:341: in test_vitals_recording
+    patient_id = patients[0]["id"]
+                 ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestErrorHandling" name="test_invalid_patient_id" time="0.008" /><testcase classname="tests.test_integration.TestErrorHandling" name="test_invalid_conversation_id" time="0.014"><failure message="KeyError: 0">test_integration.py:387: in test_invalid_conversation_id
+    "patient_id": patients[0]["id"],
+                  ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_integration.TestErrorHandling" name="test_mismatched_patient_conversation" time="0.015" /><testcase classname="tests.test_integration.TestSystemIntegration" name="test_health_check" time="0.174" /><testcase classname="tests.test_integration.TestSystemIntegration" name="test_api_docs_available" time="0.070" /><testcase classname="tests.test_integration.TestSystemIntegration" name="test_concurrent_conversations" time="0.010"><skipped type="pytest.skip" message="Need at least 2 patients">D:\Concierge Triage Agent\backend\tests\test_integration.py:436: Need at least 2 patients</skipped></testcase></testsuite></testsuites>

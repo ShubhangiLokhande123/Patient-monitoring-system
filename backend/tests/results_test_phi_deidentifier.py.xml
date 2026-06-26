@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="14" time="19.755" timestamp="2026-06-25T17:05:21.189706+05:30" hostname="DESKTOP-OD6ROMA"><testcase classname="tests.test_phi_deidentifier.TestPHIDetection" name="test_ssn_detection" time="0.149"><failure message="AssertionError: assert '123-45-6789' not in 'My SSN is 123-45-6789'&#10;  &#10;  '123-45-6789' is contained here:&#10;    My SSN is 123-45-6789">test_phi_deidentifier.py:19: in test_ssn_detection
+    assert "123-45-6789" not in masked
+E   AssertionError: assert '123-45-6789' not in 'My SSN is 123-45-6789'
+E     
+E     '123-45-6789' is contained here:
+E       My SSN is 123-45-6789</failure></testcase><testcase classname="tests.test_phi_deidentifier.TestPHIDetection" name="test_phone_detection" time="0.028" /><testcase classname="tests.test_phi_deidentifier.TestPHIDetection" name="test_email_detection" time="0.930" /><testcase classname="tests.test_phi_deidentifier.TestPHIDetection" name="test_date_detection" time="0.010" /><testcase classname="tests.test_phi_deidentifier.TestPHIDetection" name="test_multiple_phi_types" time="0.015"><failure message="assert '123-45-6789' not in &quot;I'm [PERSON...one 555-1234&quot;&#10;  &#10;  '123-45-6789' is contained here:&#10;    I'm [PERSON_2], SSN 123-45-6789, phone 555-1234&#10;  ?                     +++++++++++">test_phi_deidentifier.py:52: in test_multiple_phi_types
+    assert "123-45-6789" not in masked
+E   assert '123-45-6789' not in "I'm [PERSON...one 555-1234"
+E     
+E     '123-45-6789' is contained here:
+E       I'm [PERSON_2], SSN 123-45-6789, phone 555-1234
+E     ?                     +++++++++++</failure></testcase><testcase classname="tests.test_phi_deidentifier.TestReidentification" name="test_reidentify_restores_original" time="0.017" /><testcase classname="tests.test_phi_deidentifier.TestReidentification" name="test_consistent_placeholders" time="0.018" /><testcase classname="tests.test_phi_deidentifier.TestReidentification" name="test_session_isolation" time="0.016"><failure message="assert 0 &gt; 0&#10; +  where 0 = len({})">test_phi_deidentifier.py:91: in test_session_isolation
+    assert len(map1) &gt; 0
+E   assert 0 &gt; 0
+E    +  where 0 = len({})</failure></testcase><testcase classname="tests.test_phi_deidentifier.TestSessionManagement" name="test_clear_session" time="0.014" /><testcase classname="tests.test_phi_deidentifier.TestSessionManagement" name="test_get_mapping" time="0.013" /><testcase classname="tests.test_phi_deidentifier.TestNonPHIText" name="test_no_phi_unchanged" time="0.011"><failure message="AssertionError: assert (6 == 0 or 'I am feeling better today' == 'I am feeling...[DATE_TIME_2]'&#10; +  where 6 = len({'[PHONE_NUMBER_1]': '555-123-4567', '[EMAIL_ADDRESS_1]': 'patient@example.com', '[PERSON_1]': 'Email', '[DATE_TIME_1]': '12/25/2024', ...})&#10;  &#10;  #x1B[0m#x1B[91m- I am feeling better [DATE_TIME_2]#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ I am feeling better today#x1B[39;49;00m#x1B[90m#x1B[39;49;00m)">test_phi_deidentifier.py:127: in test_no_phi_unchanged
+    assert len(mapping) == 0 or text == masked
+E   AssertionError: assert (6 == 0 or 'I am feeling better today' == 'I am feeling...[DATE_TIME_2]'
+E    +  where 6 = len({'[PHONE_NUMBER_1]': '555-123-4567', '[EMAIL_ADDRESS_1]': 'patient@example.com', '[PERSON_1]': 'Email', '[DATE_TIME_1]': '12/25/2024', ...})
+E     
+E     #x1B[0m#x1B[91m- I am feeling better [DATE_TIME_2]#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E     #x1B[92m+ I am feeling better today#x1B[39;49;00m#x1B[90m#x1B[39;49;00m)</failure></testcase><testcase classname="tests.test_phi_deidentifier.TestNonPHIText" name="test_clinical_terms_preserved" time="0.011" /><testcase classname="tests.test_phi_deidentifier.TestPHIProtectionCompliance" name="test_no_phi_leakage" time="0.061" /><testcase classname="tests.test_phi_deidentifier.TestPHIProtectionCompliance" name="test_reversibility" time="0.058" /></testsuite></testsuites>

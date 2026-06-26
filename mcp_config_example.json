@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "concierge-triage-agent": {
+      "command": "python",
+      "args": ["mcp_server.py"],
+      "cwd": "d:\\Concierge Triage Agent",
+      "env": {
+        "GOOGLE_API_KEY": "your_api_key_here"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_active_patients",
+        "get_patient_summary",
+        "search_clinical_guidelines",
+        "get_active_alerts"
+      ]
+    }
+  }
+}

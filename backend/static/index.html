@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concierge Triage Agent - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat-card h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+        }
+        .stat-card.active-patients .value { color: #667eea; }
+        .stat-card.high-risk .value { color: #e74c3c; }
+        .stat-card.pending-alerts .value { color: #f39c12; }
+        .stat-card.calls-today .value { color: #27ae60; }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .section-body {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        /* Patients Table */
+        .patients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .patients-table th {
+            text-align: left;
+            padding: 15px 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+        .patients-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+        }
+        .patients-table tr:hover {
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+        .patients-table tr.selected {
+            background: #f0f4ff;
+        }
+        .patient-name {
+            font-weight: 500;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .risk-badge.low { background: #e8f5e9; color: #27ae60; }
+        .risk-badge.moderate { background: #fff3e0; color: #f39c12; }
+        .risk-badge.high { background: #fce4ec; color: #e91e63; }
+        .risk-badge.critical { background: #ffebee; color: #e74c3c; }
+        
+        /* Alerts */
+        .alert-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .alert-item:hover {
+            background: #f9f9f9;
+        }
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .alert-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .alert-severity {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .alert-severity.critical { background: #ffebee; color: #e74c3c; }
+        .alert-severity.high { background: #fce4ec; color: #e91e63; }
+        .alert-severity.medium { background: #fff3e0; color: #f39c12; }
+        .alert-severity.low { background: #e8f5e9; color: #27ae60; }
+        .alert-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .alert-meta {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 20px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .chat-panel.open {
+            transform: translateX(0);
+        }
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 {
+            font-size: 16px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+        }
+        .message.agent {
+            text-align: left;
+        }
+        .message.patient {
+            text-align: right;
+        }
+        .message-bubble {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .message.agent .message-bubble {
+            background: #f0f4ff;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+        .message.patient .message-bubble {
+            background: #667eea;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+        }
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+        .chat-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .chat-input button:hover {
+            background: #5a6fd6;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-secondary {
+            background: #f0f4ff;
+            color: #667eea;
+        }
+        .btn-secondary:hover {
+            background: #e0e8ff;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Risk Distribution */
+        .risk-distribution {
+            padding: 20px;
+        }
+        .risk-bar {
+            display: flex;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .risk-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .risk-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .legend-dot.low { background: #27ae60; }
+        .legend-dot.moderate { background: #f39c12; }
+        .legend-dot.high { background: #e91e63; }
+        .legend-dot.critical { background: #e74c3c; }
+        
+        /* No data */
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Concierge Triage Agent</h1>
+        <p>AI-powered post-discharge patient monitoring</p>
+    </div>
+    
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card active-patients">
+                <h3>Active Patients</h3>
+                <div class="value" id="activePatients">-</div>
+            </div>
+            <div class="stat-card high-risk">
+                <h3>High Risk</h3>
+                <div class="value" id="highRiskPatients">-</div>
+            </div>
+            <div class="stat-card pending-alerts">
+                <h3>Pending Alerts</h3>
+                <div class="value" id="pendingAlerts">-</div>
+            </div>
+            <div class="stat-card calls-today">
+                <h3>Calls Today</h3>
+                <div class="value" id="callsToday">-</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Patients Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Patients</h2>
+                    <button class="btn btn-secondary" onclick="loadPatients()">Refresh</button>
+                </div>
+                <div class="section-body">
+                    <table class="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Procedure</th>
+                                <th>Discharged</th>
+                                <th>Risk Score</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsList">
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="spinner"></div>
+                                    Loading patients...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Alerts Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Active Alerts</h2>
+                    <button class="btn btn-secondary" onclick="loadAlerts()">Refresh</button>
+                </div>
+                <div class="section-body" id="alertsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading alerts...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <h3 id="chatPatientName">Patient Chat</h3>
+            <button class="close-btn" onclick="closeChat()">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message agent">
+                <div class="message-bubble">Starting conversation...</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let currentPatientId = null;
+        let currentConversationId = null;
+        
+        // Load dashboard stats
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/alerts/dashboard`);
+                const data = await response.json();
+                
+                document.getElementById('activePatients').textContent = data.active_patients;
+                document.getElementById('highRiskPatients').textContent = data.high_risk_patients;
+                document.getElementById('pendingAlerts').textContent = data.pending_alerts;
+                document.getElementById('callsToday').textContent = data.calls_today;
+                
+                // Update risk distribution bar
+                updateRiskDistribution(data.risk_distribution);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        // Load patients
+        async function loadPatients() {
+            try {
+                const response = await fetch(`${API_BASE}/patients?status=active`);
+                const data = await response.json();
+                
+                const tbody = document.getElementById('patientsList');
+                
+                if (data.patients.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="no-data">No active patients</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.patients.map(patient => `
+                    <tr onclick="selectPatient('${patient.id}')" id="patient-${patient.id}">
+                        <td>
+                            <div class="patient-name">${patient.first_name} ${patient.last_name}</div>
+                            <div style="font-size: 12px; color: #888;">${patient.id}</div>
+                        </td>
+                        <td>${patient.procedure_name || patient.diagnosis}</td>
+                        <td>${formatDate(patient.discharge_date)}</td>
+                        <td>-</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="event.stopPropagation(); startChat('${patient.id}', '${patient.first_name}')">Chat</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                // Load risk scores for each patient
+                data.patients.forEach(async patient => {
+                    try {
+                        const riskResponse = await fetch(`${API_BASE}/patients/${patient.id}/summary`);
+                        const summary = await riskResponse.json();
+                        
+                        if (summary.latest_risk_score !== null) {
+                            const riskCell = document.querySelector(`#patient-${patient.id} td:nth-child(4)`);
+                            riskCell.innerHTML = `
+                                <span class="risk-badge ${summary.latest_risk_category?.toLowerCase() || 'low'}">${summary.latest_risk_score}</span>
+                            `;
+                        }
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                document.getElementById('patientsList').innerHTML = '<tr><td colspan="5" class="no-data">Error loading patients</td></tr>';
+            }
+        }
+        
+        // Load alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/alerts?status=active`);
+                const data = await response.json();
+                
+                const container = document.getElementById('alertsList');
+                
+                if (data.alerts.length === 0) {
+                    container.innerHTML = '<div class="no-data">No active alerts</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.alerts.slice(0, 10).map(alert => `
+                    <div class="alert-item">
+                        <div class="alert-header">
+                            <div class="alert-title">${alert.title}</div>
+                            <span class="alert-severity ${alert.severity}">${alert.severity}</span>
+                        </div>
+                        <div class="alert-description">${alert.description}</div>
+                        <div class="alert-meta">
+                            ${alert.first_name} ${alert.last_name} • ${formatDateTime(alert.created_at)}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                document.getElementById('alertsList').innerHTML = '<div class="no-data">Error loading alerts</div>';
+            }
+        }
+        
+        // Start chat with patient
+        async function startChat(patientId, patientName) {
+            currentPatientId = patientId;
+            document.getElementById('chatPatientName').textContent = `Chat with ${patientName}`;
+            document.getElementById('chatMessages').innerHTML = '<div class="message agent"><div class="message-bubble">Starting conversation...</div></div>';
+            document.getElementById('chatPanel').classList.add('open');
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat/start/${patientId}`, { method: 'POST' });
+                const data = await response.json();
+                
+                currentConversationId = data.conversation_id;
+                
+                addMessage('agent', data.response);
+            } catch (error) {
+                console.error('Error starting chat:', error);
+                addMessage('agent', 'Error starting conversation. Please try again.');
+            }
+        }
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentConversationId) return;
+            
+            input.value = '';
+            addMessage('patient', message);
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        patient_id: currentPatientId,
+                        conversation_id: currentConversationId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                addMessage('agent', data.response, data.agent_type);
+                
+                // Show alert if triggered
+                if (data.alert_triggered) {
+                    loadAlerts();
+                    loadDashboard();
+                }
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage('agent', 'Error sending message. Please try again.');
+            }
+        }
+        
+        // Add message to chat
+        function addMessage(role, content, agentType = null) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.innerHTML = `
+                <div class="message-bubble">${escapeHtml(content)}</div>
+                <div class="message-time">${time}${agentType ? ` • ${agentType}` : ''}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Close chat
+        function closeChat() {
+            document.getElementById('chatPanel').classList.remove('open');
+            currentPatientId = null;
+            currentConversationId = null;
+        }
+        
+        // Handle enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Update risk distribution
+        function updateRiskDistribution(distribution) {
+            const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+            if (total === 0) return;
+            
+            // This could be enhanced to show a visual bar
+        }
+        
+        // Select patient row
+        function selectPatient(patientId) {
+            document.querySelectorAll('.patients-table tr').forEach(row => {
+                row.classList.remove('selected');
+            });
+            document.getElementById(`patient-${patientId}`).classList.add('selected');
+        }
+        
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            return date.toLocaleDateString();
+        }
+        
+        // Format datetime
+        function formatDateTime(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialize
+        loadDashboard();
+        loadPatients();
+        loadAlerts();
+        
+        // Refresh every 30 seconds
+        setInterval(() => {
+            loadDashboard();
+            loadAlerts();
+        }, 30000);
+    </script>
+</body>
+</html>
